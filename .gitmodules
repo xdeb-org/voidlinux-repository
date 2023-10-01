@@ -1,0 +1,6 @@
+[submodule "apindex"]
+	path = apindex
+	url = https://github.com/libthinkpad/apindex.git
+[submodule "void-packages"]
+	path = void-packages
+	url = https://github.com/void-linux/void-packages.git

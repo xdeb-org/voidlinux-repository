@@ -1,0 +1,125 @@
+name: GitHub Pages
+
+on:
+  schedule:
+    # each sunday at 4:00
+    - cron: "0 4 * * 0"
+  push:
+    branches:
+      - main
+
+env:
+  GHCR_IMAGE: "ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - arch: x86_64
+            platform: linux/amd64
+          - arch: i686
+            platform: linux/i386
+          - arch: aarch64
+            platform: linux/arm64
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.config.platform }}
+
+      - name: Create XBPS packages
+        run: |
+          for xbps_pkg in $(ls -1 $(pwd)/packages); do
+            cp -R $(pwd)/packages/${xbps_pkg}/templates $(pwd)/void-packages/srcpkgs/${xbps_pkg}
+          done
+
+          repository_dir="repository-${{ matrix.config.arch }}"
+          mkdir -p ${repository_dir}
+
+          docker run --rm \
+            -v $(pwd):/workspace \
+            --platform ${{ matrix.config.platform }} \
+            ${GHCR_IMAGE}:${{ matrix.config.arch }} \
+            /workspace/scripts/create_packages.sh ${{ matrix.config.arch }} ${{ matrix.config.sha256 }}
+
+          sudo chown -R $(id -u):$(id -g) void-packages/hostdir/binpkgs
+          mv void-packages/hostdir/binpkgs/*.xbps ${repository_dir}
+
+      - name: Create XBPS repository
+        run: |
+          echo -n "${{ secrets.XBPS_REPOSITORY_KEY }}" > private.pem
+
+          docker run --rm \
+            -v $(pwd):/workspace \
+            --platform ${{ matrix.config.platform }} \
+            ${GHCR_IMAGE}:${{ matrix.config.arch }} \
+            /workspace/scripts/sign_repository.sh "repository-${{ matrix.config.arch }}" ${{ github.repository_owner }} ${{ github.event.pusher.email }}
+
+      - name: Upload repository as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: "repository-${{ matrix.config.arch }}"
+          path: "repository-${{ matrix.config.arch }}"
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:x86_64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Merge artifacts
+        run: |
+          mkdir -p repository
+          mv repository-x86_64/* repository
+          mv repository-i686/* repository
+          mv repository-aarch64/* repository
+
+      - name: Build apindex
+        run: |
+          cd apindex
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=/tmp/apindex
+          make install
+
+      - name: Generate index.html
+        run: cd repository && /tmp/apindex/bin/apindex .
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: repository
+
+  deploy:
+    needs: merge
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
