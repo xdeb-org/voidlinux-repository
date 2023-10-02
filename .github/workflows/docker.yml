@@ -1,6 +1,9 @@
 name: Build XBPS container image
 
 on:
+  schedule:
+    # each sunday at 0:00
+    - cron: "0 0 * * 0"
   push:
     branches:
       - docker
