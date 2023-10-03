@@ -35,3 +35,30 @@ After importing the key, you can execute `xbps-install <package>` to install any
 | `main` | This branch. Used to build and release all XBPS packages listed within the [`packages`](./packages) directory. |
 | `docker` | Used to build and release custom container images to be able to easily build XBPS packages. |
 | `pages` | Locked placeholder branch to stop GitHub from executing the automatic GitHub Pages CI pipeline. The `main` branch contains a custom Pages CI pipeline. |
+
+## Conventions
+
+### Package version updates
+On package version updates, the revision stays the same. Example:
+```diff
+-version=1.0.0
++version=1.0.1
+revision=1
+```
+
+### Build environment updates
+On build environment changes, e.g. updates to submodules, updates to build scripts and/or GitHub workflows, the version stays the same, while the revision is incremented. Example:
+```diff
+version=1.0.0
+-revision=1
++revision=2
+```
+
+### Revision reset
+If the revision was higher than 1, and a package version was updated, the revision is reset to 1, regardless of build environment updates within the same commit. Example:
+```diff
+-version=1.0.0
++version=1.0.1
+-revision=2
++revision=1
+```
