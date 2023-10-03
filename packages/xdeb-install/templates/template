@@ -1,7 +1,7 @@
 # Template file for 'xdeb-install'
 pkgname=xdeb-install
-version=1.2.0
-revision=5
+version=2.0.0
+revision=6
 archs="%XDEB_INSTALL_BINARY_ARCH%"
 create_wrksrc=required
 short_desc="Simple tool to automate the awesome xdeb tool"
