@@ -1,3 +1,7 @@
+[![docker Status](https://img.shields.io/github/actions/workflow/status/thetredev/voidlinux-repository/docker.yml?label=docker
+)](https://github.com/thetredev/voidlinux-repository/actions/workflows/docker.yml)
+[![Deployment Status](https://img.shields.io/github/deployments/thetredev/voidlinux-repository/github-pages?label=deployment)](https://github.com/thetredev/voidlinux-repository/actions/workflows/pages.yml)
+
 # Custom Void Linux repository
 
 This project represents my own custom Void Linux repository. It contains various XBPS packages for various architectures which didn't make the merge into the official [void-linux/void-packages](https://github.com/void-linux/void-packages) repository for one reason or another.
