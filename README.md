@@ -13,7 +13,7 @@ The image is built for multiple Void Linux architectures, including:
   - `i686`
   - `aarch64`
 
-They are published as [`ghcr.io/thetredev/voidlinux-repository:<arch>`](https://ghcr.io/thetredev/voidlinux-repository).
+They are published as [`ghcr.io/xdeb-org/voidlinux-repository:<arch>`](https://ghcr.io/xdeb-org/voidlinux-repository).
 
 **Note**: The specific images of this branch are created with CI environments in mind, without any user interaction. It is discouraged to manually use them as described in [How to use manually](#how-to-use-manually). They will mess up file permissions on the `void-packages` directory besides other things.
 
@@ -57,7 +57,7 @@ Once the `void-packages` repository is checked out and `void-packages/xbps-src` 
   run: |
     docker run --rm \
       -v $(pwd):/workspace \
-      ghcr.io/thetredev/voidlinux-repository:x86_64 \
+      ghcr.io/xdeb-org/voidlinux-repository:x86_64 \
       /workspace/scripts/build.sh
 
     sudo chown -R $(id -u):$(id -g) void-packages/hostdir/binpkgs
@@ -65,7 +65,7 @@ Once the `void-packages` repository is checked out and `void-packages/xbps-src` 
 
 After successful container execution, the XBPS packages are going to be available at `$(pwd)/void-packages/hostdir/binpkgs`, but they will be owned by the `root` user, since the container was running as `root`. `sudo chown` is used to fix that.
 
-For a more advanced example, have a look at the `GitHub Pages` job from the `main` branch of this project which utilizes a `matrix` to build XBPS packages for multiple architectures: https://github.com/thetredev/voidlinux-repository/blob/main/.github/workflows/pages.yml
+For a more advanced example, have a look at the `GitHub Pages` job from the `main` branch of this project which utilizes a `matrix` to build XBPS packages for multiple architectures: https://github.com/xdeb-org/voidlinux-repository/blob/main/.github/workflows/pages.yml
 
 ## How to sign XBPS packages
 
@@ -86,14 +86,14 @@ Using the image is fairly simple:
   ```
   2. Pull an image for your architecture, say `x86_64`:
   ```
-  $ docker pull ghcr.io/thetredev/voidlinux-repository:x86_64
+  $ docker pull ghcr.io/xdeb-org/voidlinux-repository:x86_64
   ```
   3. Run the container and mount `void-packages` as a volume:
   ```
   $ docker run --rm \
     -v $(pwd)/void-packages:/void-packages \
     -w /void-packages \
-    -it ghcr.io/thetredev/voidlinux-repository:x86_64 \
+    -it ghcr.io/xdeb-org/voidlinux-repository:x86_64 \
     bash
   ```
   4. Verify that you've landed within the `/void-packages` directory:
