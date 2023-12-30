@@ -30,7 +30,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
+
+      - name: Update submodules
+        id: update
+        run: git submodule update --remote --recursive
+
+      - name: Run git status
+        id: status
+        run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
+
+      - name: Add and commit files
+        run: |
+          git add .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Update submodules at $(date "+DATE: %Y-%m-%d TIME: %H:%M:%S")"
+        if: ${{ steps.status.outputs.status }}
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+        if: ${{ steps.status.outputs.status && github.event_name == 'push' }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
