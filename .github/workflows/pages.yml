@@ -25,7 +25,7 @@ jobs:
           - arch: aarch64
             platform: linux/arm64
     permissions:
-      contents: read
+      contents: write
       packages: read
     steps:
       - uses: actions/checkout@v4
