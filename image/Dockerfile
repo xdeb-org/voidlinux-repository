@@ -1,4 +1,4 @@
-FROM ghcr.io/void-linux/void-buildroot-glibc:20231230R1
+FROM ghcr.io/void-linux/void-buildroot-glibc:20240526R1
 
 RUN mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/ \
     && sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf \
