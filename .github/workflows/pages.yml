@@ -66,7 +66,7 @@ jobs:
             /workspace/scripts/sign_repository.sh "repository-${{ matrix.config.arch }}" ${{ github.repository_owner }} ${{ github.event.pusher.email }}
 
       - name: Upload repository as artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "repository-${{ matrix.config.arch }}"
           path: "repository-${{ matrix.config.arch }}"
@@ -85,7 +85,7 @@ jobs:
           submodules: true
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Merge artifacts
         run: |
@@ -106,7 +106,7 @@ jobs:
         run: cd repository && /tmp/apindex/bin/apindex .
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: repository
 
@@ -122,4 +122,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
